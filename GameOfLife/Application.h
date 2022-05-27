@@ -31,11 +31,11 @@ public:
 
 protected:
 private:
-	int m_windowWidth = 900;
-	int m_windowHeight = 900;
+	int m_windowWidth = 945;
+	int m_windowHeight = 945;
 
-	int m_cols = 30;
-	int m_rows = 30;
+	int m_cols = 35;
+	int m_rows = 35;
 
 	int Size = 0;
 
