@@ -88,7 +88,7 @@ void Application::Load()
 		else if (Tiles[i].FState == FEmpty)
 		{
 			//Wall
-			if (RandomBool(1, 5))
+			if (RandomBool(1, 6))
 			{
 				if (PlayerPos != i && Tiles[i].FState == FEmpty)
 				{
@@ -97,7 +97,7 @@ void Application::Load()
 				}
 			}
 			//Coin
-			else if (RandomBool(1, 5))
+			else if (RandomBool(1, 8))
 			{
 				if (PlayerPos != i && Tiles[i].FState == FEmpty)
 				{
@@ -106,7 +106,7 @@ void Application::Load()
 				}
 			}
 			//Enemy
-			else if (RandomBool(1, 20))
+			else if (RandomBool(1, 30))
 			{
 				if (PlayerPos != i && Tiles[i].FState == FEmpty)
 				{
