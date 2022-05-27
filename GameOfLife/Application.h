@@ -31,11 +31,11 @@ public:
 
 protected:
 private:
-	int m_windowWidth = 945;
-	int m_windowHeight = 945;
+	int m_windowWidth = 1000;
+	int m_windowHeight = 1000;
 
-	int m_cols = 35;
-	int m_rows = 35;
+	int m_cols = 50;
+	int m_rows = 50;
 
 	int Size = 0;
 
@@ -94,7 +94,7 @@ private:
 	float ETurnTimer = 0;
 	float ETurnTimerMax = 0.8f;
 
-	float WinAmount = 40;
+	float WinAmount = 30;
 
 	bool PTurn = true;
 	bool ETurn = true;

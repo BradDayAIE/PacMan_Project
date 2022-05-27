@@ -127,7 +127,7 @@ void Application::Unload()
 
 void Application::Update(float dt)
 {
-	if (PlayerBody.size() > 20)
+	if (PlayerBody.size() > WinAmount)
 	{
 		WinGame();
 	}
