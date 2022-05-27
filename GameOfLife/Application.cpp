@@ -36,26 +36,31 @@ void Application::Run()
 
 void Application::Load()
 {
+	//get a consistant variable for any for loops
 	Size = m_cols * m_rows;
 
+	//make all the tiles for trhe map
 	Tiles = new Tile[Size];
 
+	//get a random position for the player
 	int PlayerPos = RandomInt(0, Size);
 
 	//fill each tile
 	for (int i = 0; i < Size; i++)
 	{
+		//get the correct xy pos for each tile
 		int x = i % m_cols;
 		int y = i / m_cols;
 
 		Tiles[i].X = x;
 		Tiles[i].Y = y;
 
+		//set the fil state
 		Tiles[i].FState = FEmpty;
 		Tiles[i].EState = EEmpty;
 		Tiles[i].PState = PEmpty;
 
-		//Player
+		//Spawn the Player
 		if (i == PlayerPos)
 		{
 			Tiles[i].PState = PPlayer;
@@ -76,13 +81,11 @@ void Application::Load()
 		if (x == 0 || x == m_cols - 1)
 		{
 			Tiles[i].FState = FWall;
-			WallNum++;
 		}
 		//Create a wall if on the top or bottom of the screen
 		else if (y == 0 || y == m_rows - 1)
 		{
 			Tiles[i].FState = FWall;
-			WallNum++;
 		}
 		//Create check if a random wall, player, coin or enemy should be created
 		else if (Tiles[i].FState == FEmpty)
@@ -93,7 +96,6 @@ void Application::Load()
 				if (PlayerPos != i && Tiles[i].FState == FEmpty)
 				{
 					Tiles[i].FState = FWall;
-					WallNum++;
 				}
 			}
 			//Coin
@@ -102,7 +104,6 @@ void Application::Load()
 				if (PlayerPos != i && Tiles[i].FState == FEmpty)
 				{
 					Tiles[i].FState = FCoin;
-					CoinNum++;
 				}
 			}
 			//Enemy
@@ -127,6 +128,7 @@ void Application::Unload()
 
 void Application::Update(float dt)
 {
+	//check if the player has won or lost
 	if (PlayerBody.size() > WinAmount)
 	{
 		WinGame();
@@ -136,6 +138,7 @@ void Application::Update(float dt)
 		LoseGame();
 	}
 
+	//control the players turn timer and allow player to move if 0
 	if (PTurnTimer <= 0)
 	{
 		PTurn = true;
@@ -147,6 +150,7 @@ void Application::Update(float dt)
 		PTurn = false;
 	}
 
+	//control the enemy turn timer and allow enemy to move if 0
 	if (ETurnTimer <= 0)
 	{
 		ETurn = true;
@@ -158,37 +162,49 @@ void Application::Update(float dt)
 		ETurn = false;
 	}
 
+	//run the code to move the enemys
 	for (int i = 0; i < Enemys.size(); i++)
 	{
+		// MoveObject (is it the player? 
+		//what is it's position in the vector? 
+		//what direction to move if it is the player (x,y)?)
 		MoveObject(false, i, 0, 0);
 	}
 
-	//Player input
+	//Player input for player head
 	MovePlayer();
 
 	//Update Positions 
 	for (int i = 0; i < Size; i++)
 	{
+		//check if the player or enemy's position has alrady been set to this tile
+		//if not this tile has no players or enemys
 		bool PSet = false;
 		bool ESet = false;
+
+		//if any enemys are at the same x,y pos than they are on this tile
 		for (int y = 0; y < Enemys.size(); y++)
 		{
 			if (Tiles[i].X == Enemys.at(y).X && Tiles[i].Y == Enemys.at(y).Y)
 			{
+				//set this tile's enemy state to enemy instead of empty
 				Tiles[i].EState = EEnemy;
 				ESet = true;
 			}
 		}
 
+		//if any players are at the same x,y pos than they are on this tile
 		for (int y = 0; y < PlayerBody.size(); y++)
 		{
 			if (Tiles[i].X == PlayerBody.at(y).X && Tiles[i].Y == PlayerBody.at(y).Y)
 			{
+				//set this tile's players state to player instead of empty
 				Tiles[i].PState = PPlayer;
 				PSet = true;
 			}
 		}
 
+		//set the states to empty if these values are not set to true
 		if (PSet == false)
 		{
 			Tiles[i].PState = PEmpty;
@@ -202,16 +218,20 @@ void Application::Update(float dt)
 		//Collisions
 		if (Tiles[i].FState == FEmpty)
 		{
+			//if it is the players turn
 			if (PTurn)
 			{
+				//if a enemy and player are on this tile
 				if (Tiles[i].EState == EEnemy && Tiles[i].PState == PPlayer)
 				{
+					//is the player body length is greater than 1
 					if (PlayerBody.size() > 1)
 					{
 						for (int x = 0; x < PlayerBody.size(); x++)
 						{
 							if (Tiles[i].X == PlayerBody.at(x).X && Tiles[i].Y == PlayerBody.at(x).Y)
 							{
+								//if this is the player head than add to the body, if not than reduce the player size
 								if (PlayerBody.at(x).Head)
 								{
 									PlayerBody.pop_back();
@@ -225,12 +245,14 @@ void Application::Update(float dt)
 							}
 						}
 					}
+					//if player body length is less than one
 					else 
 					{
 						for (int x = 0; x < PlayerBody.size(); x++)
 						{
 							if (Tiles[i].X == PlayerBody.at(x).X && Tiles[i].Y == PlayerBody.at(x).Y)
 							{
+								//if this is the player head than add to the body, if not than reduce the player size
 								if (!PlayerBody.at(x).Head)
 								{
 									PlayerBody.push_back(Player());
@@ -241,12 +263,15 @@ void Application::Update(float dt)
 						}
 					}
 
+					//the player has collided with a enemy
+					//if we have enemys
 					if (Enemys.size() > 0)
 					{
 						for (int x = 0; x < Enemys.size(); x++)
 						{
 							if (Tiles[i].X == Enemys.at(x).X && Tiles[i].Y == Enemys.at(x).Y)
 							{
+								//remove the enemy we hit
 								Enemys.erase(Enemys.begin() + x);
 							}
 						}
@@ -255,6 +280,7 @@ void Application::Update(float dt)
 			}
 		}
 
+		//if we hit a coint then make the player body longer and remove the coin
 		if (Tiles[i].FState == FCoin && Tiles[i].PState == PPlayer)
 		{
 			GameStarted = false;
@@ -290,6 +316,7 @@ void Application::Draw()
 	// Draw the Tiles
 	for (int i = 0; i < Size; i++)
 	{
+		//draw the walls, coins, players and enemys if they are on this tile
 		if (Tiles[i].FState == FWall)
 		{
 			DrawRectangle(Tiles[i].X * tileWidth, Tiles[i].Y * tileHeight, tileWidth, tileHeight, DARKGRAY);
@@ -302,6 +329,7 @@ void Application::Draw()
 
 		if (Tiles[i].PState == PPlayer)
 		{
+			//use what player this is as the number drawn on them
 			for (int x = 0; x < PlayerBody.size(); x++)
 			{
 				if (Tiles[i].X == PlayerBody.at(x).X && Tiles[i].Y == PlayerBody.at(x).Y)
@@ -318,6 +346,7 @@ void Application::Draw()
 		}
 	}
 
+	//draw the win or lose text if we win
 	if (Win) 
 	{
 		DrawRectangle(m_windowWidth / 3, m_windowHeight / 2.01f, 250, 50, GRAY);
@@ -333,8 +362,10 @@ void Application::Draw()
 
 void Application::MoveObject(bool IsPlayer, int WhichOne, int XDir, int YDir)
 {
+	//if we haven't won or lost and this is the player
 	if (IsPlayer && !Lose && !Win)
 	{
+		//go through every tile and check if the player is next to this tile 
 		for (int i = 0; i < Size; i++)
 		{
 			if (Tiles[i].FState != FWall && Tiles[i].PState != PPlayer)
@@ -346,6 +377,7 @@ void Application::MoveObject(bool IsPlayer, int WhichOne, int XDir, int YDir)
 					PlayerBody.at(WhichOne).PreX = PlayerBody.at(WhichOne).X;
 					PlayerBody.at(WhichOne).PreY = PlayerBody.at(WhichOne).Y;
 
+					//if we are trying to move in the y direction and the tile is not a wall then move the player
 					if (YDir != 0)
 					{
 						if (PTurn)
@@ -377,7 +409,7 @@ void Application::MoveObject(bool IsPlayer, int WhichOne, int XDir, int YDir)
 						}
 					}
 
-
+					//if we are trying to move in the x direction and the tile is not a wall then move the player
 					if (XDir != 0)
 					{
 						if (PTurn)
@@ -412,6 +444,7 @@ void Application::MoveObject(bool IsPlayer, int WhichOne, int XDir, int YDir)
 			}
 			else
 			{
+				//if we are about to hit a wall stop moving and reduce the player size
 				if (Tiles[i].Y == PlayerBody.at(WhichOne).Y + YDir && Tiles[i].X == PlayerBody.at(WhichOne).X + XDir)
 				{
 					if (PlayerBody.size() > 1)
@@ -424,14 +457,16 @@ void Application::MoveObject(bool IsPlayer, int WhichOne, int XDir, int YDir)
 					}
 					else
 					{
-						WindowShouldClose();
+						LoseGame();
 					}
 				}
 			}
 		}
 	}
+	//if this is the enemy and they can move
 	else if(!IsPlayer && !EStopMoving)
 	{
+	//get a random direction
 		static std::random_device device;
 		static std::default_random_engine generator{ device() };
 
@@ -440,6 +475,7 @@ void Application::MoveObject(bool IsPlayer, int WhichOne, int XDir, int YDir)
 		int dir = distribution(generator);
 		int amount = distribution(generator);
 
+		//if there is a tile in that direction, that the enemy can move to then move there
 		for (int i = 0; i < Size; i++)
 		{
 			if (Tiles[i].FState != FWall && Tiles[i].EState != EEnemy)
@@ -528,6 +564,7 @@ void Application::MovePlayer()
 	{
 		int num = 1;
 
+		//pull the next part of the player body to this tiles previous location (make sure we go through each part of the body from top to bottom)
 		for (int t = 0; t < Size; t++)
 		{
 			for (int i = 1; i < PlayerBody.size(); i++)
