@@ -94,6 +94,8 @@ private:
 	float ETurnTimer = 0;
 	float ETurnTimerMax = 0.8f;
 
+	float WinAmount = 40;
+
 	bool PTurn = true;
 	bool ETurn = true;
 
