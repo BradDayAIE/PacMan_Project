@@ -127,7 +127,7 @@ void Application::Unload()
 
 void Application::Update(float dt)
 {
-	if (PlayerBody.size() > 20)
+	if (PlayerBody.size() > WinAmount)
 	{
 		WinGame();
 	}
@@ -217,6 +217,21 @@ void Application::Update(float dt)
 									PlayerBody.pop_back();
 								}
 								else 
+								{
+									PlayerBody.push_back(Player());
+									PlayerBody.at(PlayerBody.size() - 1).X = PlayerBody.at(PlayerBody.size() - 2).PreX;
+									PlayerBody.at(PlayerBody.size() - 1).Y = PlayerBody.at(PlayerBody.size() - 2).PreY;
+								}
+							}
+						}
+					}
+					else 
+					{
+						for (int x = 0; x < PlayerBody.size(); x++)
+						{
+							if (Tiles[i].X == PlayerBody.at(x).X && Tiles[i].Y == PlayerBody.at(x).Y)
+							{
+								if (!PlayerBody.at(x).Head)
 								{
 									PlayerBody.push_back(Player());
 									PlayerBody.at(PlayerBody.size() - 1).X = PlayerBody.at(PlayerBody.size() - 2).PreX;
